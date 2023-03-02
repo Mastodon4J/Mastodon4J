@@ -1,0 +1,133 @@
+/**
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2023-2023 Mastodon4J
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+ * associated documentation files (the "Software"), to deal in the Software without restriction,
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+ * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+plugins {
+  id 'java-library'
+  id 'signing'
+  id 'maven-publish'
+  id 'com.github.ben-manes.versions' version '0.45.0'
+  id 'com.github.hierynomus.license' version '0.16.1'
+}
+
+group = 'org.mastodon4j'
+version = '1.0.0-SNAPSHOT'
+
+defaultTasks 'build'
+
+allprojects {
+  apply plugin: 'com.github.hierynomus.license'
+
+  license {
+    header rootProject.file('gradle/LICENSE_HEADER')
+    ext.copyrightYear = "2023-" + Calendar.getInstance().get(Calendar.YEAR)
+    ext.author = 'Mastodon4J'
+  }
+
+  repositories {
+    mavenCentral()
+  }
+}
+
+subprojects {
+  apply plugin: 'java-library'
+
+  dependencies {
+    testImplementation 'org.assertj:assertj-core:3.24.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.1.1'
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-runner:1.9.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
+  }
+
+  test {
+    useJUnitPlatform()
+  }
+}
+
+java {
+  withJavadocJar()
+  withSourcesJar()
+}
+
+compileJava   {
+  sourceCompatibility = JavaVersion.VERSION_17
+  targetCompatibility = JavaVersion.VERSION_17
+}
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      artifactId = 'mastodon4j'
+      from components.java
+      pom {
+        name = 'mastodon4j'
+        description = 'Mastodon4J'
+        url = 'https://github.com/Mastodon4J/Mastodon4J'
+        licenses {
+          license {
+            name = 'MIT'
+            url = 'https://spdx.org/licenses/MIT.htm'
+          }
+        }
+        developers {
+          developer {
+            id = 'reinhapa'
+            name = 'Patrick Reinhart'
+            email = 'patrick@reini.net'
+          }
+        }
+        scm {
+          url = 'https://github.com/Mastodon4J/Mastodon4J/'
+          connection = 'scm:git:git://github.com/Mastodon4J/Mastodon4J.git'
+          developerConnection = 'scm:git:git@github.com:Mastodon4J/Mastodon4J.git'
+        }
+      }
+    }
+  }
+  repositories {
+    maven {
+      def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+      def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots"
+      url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+      credentials {
+        username = project.properties['sonatypeUsername'] ?: "none"
+        password = project.properties['sonatypePassword'] ?: "none"
+      }
+    }
+  }
+}
+
+signing {
+  sign publishing.publications.mavenJava
+}
+
+dependencyUpdates.resolutionStrategy {
+  componentSelection { rules ->
+    rules.all { ComponentSelection selection ->
+      boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm', 'preview', 'b', 'pr', 'ea'].any { qualifier ->
+        selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-+]*/
+      }
+      if (rejected) {
+        selection.reject('Release candidate')
+      }
+    }
+  }
+}
