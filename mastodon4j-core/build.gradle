@@ -28,5 +28,5 @@ dependencies {
     api 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     api 'io.github.openfeign:feign-core'
     api 'io.github.openfeign:feign-jackson'
-
+    api 'io.github.openfeign:feign-java11'
 }
