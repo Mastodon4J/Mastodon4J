@@ -5,9 +5,9 @@ name: CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   build:
@@ -29,11 +29,11 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build
-    - name: SonarQube
-      if:  ${{ matrix.jdk == '17' }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-      run: ./gradlew sonarqube -PsonarToken=${{ secrets.SONAR_TOKEN }}
+#    - name: SonarQube
+#      if:  ${{ matrix.jdk == '17' }}
+#      env:
+#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+#      run: ./gradlew sonarqube -PsonarToken=${{ secrets.SONAR_TOKEN }}
   deploy:
     if: ${{ github.event_name != 'pull_request' }}
     needs: [ build ]
