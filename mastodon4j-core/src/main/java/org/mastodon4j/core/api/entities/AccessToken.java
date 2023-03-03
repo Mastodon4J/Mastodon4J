@@ -1,7 +1,7 @@
-/**
+/*
  * The MIT License (MIT)
  *
- * Copyright (c) 2023-2023 Mastodon4J
+ * Copyright (c) 2023 Mastodon4J
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -48,7 +48,7 @@ public record AccessToken(String access_token,
      * @param accessToken the access token string
      * @return the authorization token instance
      */
-    public static  AccessToken create(String accessToken) {
+    public static AccessToken create(String accessToken) {
         return  new AccessToken(accessToken, "Bearer", null, null);
     }
 }

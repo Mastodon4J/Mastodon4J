@@ -1,7 +1,7 @@
-/**
+/*
  * The MIT License (MIT)
  *
- * Copyright (c) 2023-2023 Mastodon4J
+ * Copyright (c) 2023 Mastodon4J
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,14 +23,23 @@
  */
 package org.mastodon4j.core.api;
 
-import feign.Param;
 import feign.QueryMap;
 import feign.RequestLine;
 import org.mastodon4j.core.api.entities.Search;
 
 import java.util.Map;
 
+/**
+ * Contains all global related REST call methods.
+ */
 public interface Globals {
+
+    /**
+     * Search for content in accounts, statuses and hashtags.
+     *
+     * @param queryMap map containing all query parameter name/value combinations
+     * @return a search result instance
+     */
     @RequestLine("GET /api/v2/search")
     Search search(@QueryMap Map<String, Object> queryMap);
 }

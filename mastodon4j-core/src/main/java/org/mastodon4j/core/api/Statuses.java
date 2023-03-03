@@ -1,7 +1,7 @@
-/**
+/*
  * The MIT License (MIT)
  *
- * Copyright (c) 2023-2023 Mastodon4J
+ * Copyright (c) 2023 Mastodon4J
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,8 @@ import feign.RequestLine;
 import org.mastodon4j.core.api.entities.Status;
 
 /**
+ * Contains all status related REST call methods.
+ *
  * @see <a href="https://docs.joinmastodon.org/methods/statuses/">mastodon/statuses</a>
  */
 public interface Statuses {
