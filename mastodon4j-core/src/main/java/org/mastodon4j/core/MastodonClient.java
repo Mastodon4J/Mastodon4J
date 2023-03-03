@@ -1,7 +1,7 @@
-/**
+/*
  * The MIT License (MIT)
  *
- * Copyright (c) 2023-2023 Mastodon4J
+ * Copyright (c) 2023 Mastodon4J
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import feign.Feign;
-import feign.Feign.Builder;
 import feign.http2client.Http2Client;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
@@ -41,11 +40,11 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 
 public class MastodonClient implements MastodonApi {
-    private final Builder builder;
+    private final Feign.Builder builder;
     private final String restUrl;
     private final Globals globals;
 
-    MastodonClient(final Builder builder, String restUrl) {
+    MastodonClient(final Feign.Builder builder, String restUrl) {
         this.builder = builder;
         this.restUrl = restUrl;
         this.globals = builder.target(Globals.class, restUrl);
@@ -68,7 +67,7 @@ public class MastodonClient implements MastodonApi {
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                 .configure(SerializationFeature.INDENT_OUTPUT, true);
 
-        final Builder builder = Feign.builder()
+        final Feign.Builder builder = Feign.builder()
                 .client(new Http2Client())
                 .encoder(new JacksonEncoder(objectMapper))
                 .decoder(new JacksonDecoder(objectMapper))

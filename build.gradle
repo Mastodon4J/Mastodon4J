@@ -1,45 +1,136 @@
-/**
+/*
  * The MIT License (MIT)
  *
- * Copyright (c) 2023-2023 Mastodon4J
+ * Copyright (c) 2023 Mastodon4J
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
- * associated documentation files (the "Software"), to deal in the Software without restriction,
- * including without limitation the rights to use, copy, modify, merge, publish, distribute,
- * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
- * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 plugins {
   id 'java-library'
-  id 'signing'
-  id 'maven-publish'
-  id 'com.github.ben-manes.versions' version '0.45.0'
-  id 'com.github.hierynomus.license' version '0.16.1'
+  id 'com.diffplug.spotless' version '6.16.0'
+  id 'org.owasp.dependencycheck' version '8.1.2'
+  id 'org.kordamp.gradle.java-project' version '0.49.0'
 }
+
+apply {
+  plugin 'org.kordamp.gradle.checkstyle'
+  plugin 'org.kordamp.gradle.errorprone'
+  plugin 'org.kordamp.gradle.sonar'
+}
+
+if (!project.hasProperty('sonatypeUsername')) ext.sonatypeUsername = '**undefined**'
+if (!project.hasProperty('sonatypePassword')) ext.sonatypePassword = '**undefined**'
+if (!project.hasProperty('sonarToken')) ext.sonarToken = '**undefined**'
 
 group = 'org.mastodon4j'
 version = '1.0.0-SNAPSHOT'
 
 defaultTasks 'build'
 
-allprojects {
-  apply plugin: 'com.github.hierynomus.license'
 
-  license {
-    header rootProject.file('gradle/LICENSE_HEADER')
-    ext.copyrightYear = "2023-" + Calendar.getInstance().get(Calendar.YEAR)
-    ext.author = 'Mastodon4J'
+config {
+  release = !project.version.endsWith('-SNAPSHOT')
+  info {
+    vendor = 'Mastodon4J'
+    name = 'Mastodon4J client library'
+    description = 'Mastodon4J is an open-source Java library for the Mastodon API.'
+    inceptionYear = '2023'
+    links {
+      website = 'https://github.com/Mastodon4J/Mastodon4J'
+      issueTracker = 'https://github.com/Mastodon4J/Mastodon4J/issues'
+      scm = 'https://github.com/Mastodon4J/Mastodon4J.git'
+    }
+    scm {
+      connection = 'scm:git://github.com/Mastodon4J/Mastodon4J.git'
+      developerConnection = 'scm:git://github.com/Mastodon4J/Mastodon4J.git'
+      url = 'https://github.com/Mastodon4J/Mastodon4J'
+    }
+    people {
+      person {
+        id = 'reinhapa'
+        name = 'Patrick Reinhart'
+        email = 'patrick@reini.net'
+        roles = [ 'developer' ]
+      }
+    }
+    repositories {
+      repository {
+        name = 'sonatypeRelease'
+        url  = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+        credentials {
+          username = sonatypeUsername
+          password = sonatypePassword
+        }
+      }
+      repository {
+        name = 'sonatypeSnapshot'
+        url  = 'https://oss.sonatype.org/content/repositories/snapshots/'
+        credentials {
+          username = sonatypeUsername
+          password = sonatypePassword
+        }
+      }
+    }
   }
+  quality {
+    errorprone {
+      errorProneVersion = '2.16'
+    }
+    sonar {
+      hostUrl = 'https://sonarcloud.io'
+      login = sonarToken
+      organization = 'reinhapa'
+      projectKey = 'reinhapa_virtual-printer'
+    }
+  }
+  licensing {
+    licenses {
+      license {
+        id = 'MIT'
+      }
+    }
+  }
+  docs {
+    javadoc {
+      autoLinks.enabled = false
+      options {
+        docTitle = "Mastodon4J ${project.version} API"
+        header = "Mastodon4J ${project.version} API"
+        windowTitle = "Mastodon4J ${project.version} API"
+      }
+    }
+  }
+  artifacts {
+    minpom.enabled = false
+  }
+  publishing {
+    signing {
+      enabled = release
+      secretKey = project.hasProperty('signingKey') ? signingKey : null
+      password = project.hasProperty('signingPassword') ? signingPassword : null
+    }
+    releasesRepository  = 'sonatypeRelease'
+    snapshotsRepository = 'sonatypeSnapshot'
+  }
+}
 
+allprojects {
   repositories {
     mavenCentral()
   }
@@ -57,77 +148,38 @@ subprojects {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
   }
 
+  compileJava {
+    doFirst {
+      options.compilerArgs = [
+              '-Xlint:all'
+      ]
+    }
+  }
+
+  compileJava {
+    doFirst {
+      options.compilerArgs = [
+              '-Xlint:all'
+      ]
+    }
+  }
+
+  jar {
+    manifest.attributes 'Automatic-Module-Name': group + "." + project.name
+  }
+
+  java {
+    sourceCompatibility = JavaVersion.VERSION_17
+  }
+
+  spotless {
+    java {
+//      eclipse().configFile("gradle/mastodon4j-style.xml")
+//      importOrderFile('gradle/mastodon4j.importorder')
+    }
+  }
+
   test {
     useJUnitPlatform()
-  }
-}
-
-java {
-  withJavadocJar()
-  withSourcesJar()
-}
-
-compileJava   {
-  sourceCompatibility = JavaVersion.VERSION_17
-  targetCompatibility = JavaVersion.VERSION_17
-}
-
-publishing {
-  publications {
-    mavenJava(MavenPublication) {
-      artifactId = 'mastodon4j'
-      from components.java
-      pom {
-        name = 'mastodon4j'
-        description = 'Mastodon4J'
-        url = 'https://github.com/Mastodon4J/Mastodon4J'
-        licenses {
-          license {
-            name = 'MIT'
-            url = 'https://spdx.org/licenses/MIT.htm'
-          }
-        }
-        developers {
-          developer {
-            id = 'reinhapa'
-            name = 'Patrick Reinhart'
-            email = 'patrick@reini.net'
-          }
-        }
-        scm {
-          url = 'https://github.com/Mastodon4J/Mastodon4J/'
-          connection = 'scm:git:git://github.com/Mastodon4J/Mastodon4J.git'
-          developerConnection = 'scm:git:git@github.com:Mastodon4J/Mastodon4J.git'
-        }
-      }
-    }
-  }
-  repositories {
-    maven {
-      def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
-      def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots"
-      url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-      credentials {
-        username = project.properties['sonatypeUsername'] ?: "none"
-        password = project.properties['sonatypePassword'] ?: "none"
-      }
-    }
-  }
-}
-
-signing {
-  sign publishing.publications.mavenJava
-}
-
-dependencyUpdates.resolutionStrategy {
-  componentSelection { rules ->
-    rules.all { ComponentSelection selection ->
-      boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm', 'preview', 'b', 'pr', 'ea'].any { qualifier ->
-        selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-+]*/
-      }
-      if (rejected) {
-        selection.reject('Release candidate')
-      }
-    }
   }
 }

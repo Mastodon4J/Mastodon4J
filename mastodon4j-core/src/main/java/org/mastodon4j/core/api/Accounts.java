@@ -1,7 +1,7 @@
-/**
+/*
  * The MIT License (MIT)
  *
- * Copyright (c) 2023-2023 Mastodon4J
+ * Copyright (c) 2023 Mastodon4J
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,8 @@
 package org.mastodon4j.core.api;
 
 /**
+ * Contains all account related REST call methods.
+ *
  * @see <a href="https://docs.joinmastodon.org/methods/accounts/">mastodon/accounts</a>
  */
 public interface Accounts {

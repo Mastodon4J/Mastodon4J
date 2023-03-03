@@ -1,7 +1,7 @@
-/**
+/*
  * The MIT License (MIT)
  *
- * Copyright (c) 2023-2023 Mastodon4J
+ * Copyright (c) 2023 Mastodon4J
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,26 +23,38 @@
  */
 package org.mastodon4j.core.api.entities;
 
-/**
- * @param access_token the access token
- * @param type the subscription type
- * @param stream the stream name
- * @param list the optional list id
- * @param tag the optional hash stream tag
- */
 public record Subscription(String access_token,
                            String type,
                            String stream,
                            String list,
                            String tag) {
+
+    /**
+     * Create a subscription using the following parameters.
+     *
+     * @param accessToken the access token
+     * @param stream the stream name
+     */
     public static Subscription subscribeStream(AccessToken accessToken, String stream) {
         return new Subscription(accessToken.access_token(), "subscribe", stream, null, null);
     }
 
+    /**
+     * Create a subscription using the following parameters.
+     *
+     * @param accessToken the access token
+     * @param tag the optional hash stream tag
+     */
     public static Subscription subscribeHashtag(AccessToken accessToken, String tag) {
         return new Subscription(accessToken.access_token(), "subscribe", "hashtag", null, tag);
     }
 
+    /**
+     * Create a subscription using the following parameters.
+     *
+     * @param accessToken the access token
+     * @param stream the stream name
+     */
     public static Subscription unsubscribe(AccessToken accessToken, String stream) {
         return new Subscription(accessToken.access_token(), "unsubscribe", stream, null, null);
     }

@@ -1,7 +1,7 @@
-/**
+/*
  * The MIT License (MIT)
  *
- * Copyright (c) 2023-2023 Mastodon4J
+ * Copyright (c) 2023 Mastodon4J
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,9 @@ package org.mastodon4j.core.api;
 
 import org.mastodon4j.core.api.entities.Search;
 
+/**
+ * Represents the main Mastodom4J interface.
+ */
 public interface MastodonApi extends Globals {
     Apps apps();
 
@@ -38,5 +41,11 @@ public interface MastodonApi extends Globals {
 
     // other global methods
 
+    /**
+     * Search for content in accounts, statuses and hashtags.
+     *
+     * @param query the search query to execute
+     * @return a search result instance
+     */
     Search search(String query);
 }
