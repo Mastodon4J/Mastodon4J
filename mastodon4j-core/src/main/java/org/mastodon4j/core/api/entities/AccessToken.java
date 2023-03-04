@@ -1,4 +1,6 @@
 /*
+ * SPDX-License-Identifier: MIT
+ *
  * The MIT License (MIT)
  *
  * Copyright (c) 2023 Mastodon4J
@@ -24,10 +26,7 @@
 package org.mastodon4j.core.api.entities;
 
 /**
- * @param access_token the access token value
- * @param token_type the token type
- * @param scope the access scope
- * @param created_at the creation time
+ * Represents a REST access token.
  */
 public record AccessToken(String access_token,
                           String token_type,

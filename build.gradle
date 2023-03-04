@@ -1,4 +1,6 @@
 /*
+ * SPDX-License-Identifier: MIT
+ *
  * The MIT License (MIT)
  *
  * Copyright (c) 2023 Mastodon4J
@@ -38,11 +40,17 @@ if (!project.hasProperty('sonatypeUsername')) ext.sonatypeUsername = '**undefine
 if (!project.hasProperty('sonatypePassword')) ext.sonatypePassword = '**undefined**'
 if (!project.hasProperty('sonarToken')) ext.sonarToken = '**undefined**'
 
-group = 'org.mastodon4j'
-version = '1.0.0-SNAPSHOT'
 
 defaultTasks 'build'
 
+allprojects {
+  project.group = 'org.mastodon4j'
+  project.version = '1.0.0-SNAPSHOT'
+
+  repositories {
+    mavenCentral()
+  }
+}
 
 config {
   release = !project.version.endsWith('-SNAPSHOT')
@@ -90,13 +98,13 @@ config {
   }
   quality {
     errorprone {
-      errorProneVersion = '2.16'
+      errorProneVersion = '2.18.0'
     }
     sonar {
       hostUrl = 'https://sonarcloud.io'
       login = sonarToken
-      organization = 'reinhapa'
-      projectKey = 'reinhapa_virtual-printer'
+      organization = 'Mastodon4J'
+      projectKey = 'Mastodon4J_Mastodon4J'
     }
   }
   licensing {
@@ -130,12 +138,6 @@ config {
   }
 }
 
-allprojects {
-  repositories {
-    mavenCentral()
-  }
-}
-
 subprojects {
   apply plugin: 'java-library'
 
@@ -165,7 +167,7 @@ subprojects {
   }
 
   jar {
-    manifest.attributes 'Automatic-Module-Name': group + "." + project.name
+    manifest.attributes 'Automatic-Module-Name': "org.mastodon4j.${project.name}"
   }
 
   java {

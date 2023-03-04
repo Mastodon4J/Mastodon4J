@@ -25,10 +25,14 @@
  */
 package org.mastodon4j.core.api.entities;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
-public record Tag(String name,
-                  String url,
-                  List<History> history,
-                  Boolean following) {
+public record Filter(String id,
+                     String title,
+                     List<String> context, //one of:  home, notifications, public, thread, account
+                     @Optional ZonedDateTime expires_at,
+                     String filter_action, //one of: warn, hide
+                     List<FilterKeyword> keywords,
+                     List<FilterStatus> statuses) {
 }

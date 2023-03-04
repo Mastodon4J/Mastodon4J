@@ -1,4 +1,6 @@
 /*
+ * SPDX-License-Identifier: MIT
+ *
  * The MIT License (MIT)
  *
  * Copyright (c) 2023 Mastodon4J
@@ -24,13 +26,7 @@
 package org.mastodon4j.core.api.entities;
 
 /**
- * @param id the client id
- * @param name the client name
- * @param website the client web site
- * @param redirect_uri the redirect URI
- * @param client_id the client id
- * @param client_secret the client secret
- * @param vapid_key the vapid key value
+ * Represents a REST client application.
  */
 public record ClientApplication(String id,
                                 String name,

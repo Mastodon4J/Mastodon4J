@@ -1,4 +1,6 @@
 /*
+ * SPDX-License-Identifier: MIT
+ *
  * The MIT License (MIT)
  *
  * Copyright (c) 2023 Mastodon4J
@@ -26,9 +28,7 @@ package org.mastodon4j.core.api.entities;
 import java.util.List;
 
 /**
- * @param stream the list of stream names
- * @param event the event type
- * @param payload the optional event payload
+ * Represents a REST stream event.
  */
 public record Event(List<String> stream,
                     String event,

@@ -25,10 +25,5 @@
  */
 package org.mastodon4j.core.api.entities;
 
-import java.util.List;
-
-public record Tag(String name,
-                  String url,
-                  List<History> history,
-                  Boolean following) {
+public @interface Optional {
 }

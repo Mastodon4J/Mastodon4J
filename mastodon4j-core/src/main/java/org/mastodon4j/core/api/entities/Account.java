@@ -1,4 +1,6 @@
 /*
+ * SPDX-License-Identifier: MIT
+ *
  * The MIT License (MIT)
  *
  * Copyright (c) 2023 Mastodon4J
@@ -38,17 +40,17 @@ public record Account(String id,
                       String avatar_static,
                       String header,
                       String header_static,
-                      String locked,
+                      Boolean locked,
                       List<Field> fields,
                       List<CustomEmoji> emojis,
-                      String bot,
-                      String group,
-                      String discoverable,
-                      String noindex, //OPTIONAL
-                      String moved, //OPTIONAL
-                      String suspended, //OPTIONAL
-                      String limited, //OPTIONAL
-                      String created_at,
+                      Boolean bot,
+                      Boolean group,
+                      Boolean discoverable,
+                      @Optional Boolean noindex,
+                      @Optional Account moved,
+                      @Optional Boolean suspended,
+                      @Optional Boolean limited,
+                      ZonedDateTime created_at,
                       String last_status_at,
                       Integer statuses_count,
                       Integer followers_count,

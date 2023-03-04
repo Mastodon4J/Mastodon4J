@@ -1,4 +1,6 @@
 /*
+ * SPDX-License-Identifier: MIT
+ *
  * The MIT License (MIT)
  *
  * Copyright (c) 2023 Mastodon4J
@@ -23,7 +25,9 @@
  */
 package org.mastodon4j.core.api.entities;
 
+import java.time.ZonedDateTime;
+
 public record Field(String name,
                     String value,
-                    String verified_at) {
+                    ZonedDateTime verified_at) {
 }
