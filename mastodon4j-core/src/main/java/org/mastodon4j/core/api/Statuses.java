@@ -35,6 +35,14 @@ import org.mastodon4j.core.api.entities.Status;
  * @see <a href="https://docs.joinmastodon.org/methods/statuses/">mastodon/statuses</a>
  */
 public interface Statuses {
+    /**
+     * <a href="https://docs.joinmastodon.org/methods/statuses/#get">View a single status</a>.
+     * <p>
+     * Obtain information about a status.
+     *
+     * @param id the status id
+     * @return the status
+     */
     @RequestLine("GET /api/v1/statuses/{id}")
-    Status getStatus(@Param("id") String id);
+    Status get(@Param("id") String id);
 }

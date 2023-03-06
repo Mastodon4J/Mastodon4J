@@ -25,13 +25,8 @@
  */
 package org.mastodon4j.core.api.entities;
 
-import java.lang.annotation.Retention;
-
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
-/**
- * This annotation marks all attribute that are optional and can be {@code null}.
- */
-@Retention(RUNTIME)
-public @interface Optional {
+public record MList(String id,
+                    String title,
+                    // One of: followed, list, none
+                    String replies_policy) {
 }

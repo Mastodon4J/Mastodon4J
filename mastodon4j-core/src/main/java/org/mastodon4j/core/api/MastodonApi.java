@@ -35,11 +35,13 @@ public interface MastodonApi extends Globals {
 
     Accounts accounts();
 
+    Lists lists();
+
+    Notifications notifications();
+
     Statuses statuses();
 
     Timelines timelines();
-
-    Notifications notifications();
 
     // other global methods
 

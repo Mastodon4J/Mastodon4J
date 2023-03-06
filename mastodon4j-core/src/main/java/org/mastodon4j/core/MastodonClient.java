@@ -80,13 +80,23 @@ public class MastodonClient implements MastodonApi {
     }
 
     @Override
+    public Accounts accounts() {
+        return builder.target(Accounts.class, restUrl);
+    }
+
+    @Override
     public Apps apps() {
         return builder.target(Apps.class, restUrl);
     }
 
     @Override
-    public Accounts accounts() {
-        return builder.target(Accounts.class, restUrl);
+    public Lists lists() {
+        return builder.target(Lists.class, restUrl);
+    }
+
+    @Override
+    public Notifications notifications() {
+        return builder.target(Notifications.class, restUrl);
     }
 
     @Override
@@ -100,17 +110,12 @@ public class MastodonClient implements MastodonApi {
     }
 
     @Override
-    public Notifications notifications() {
-        return builder.target(Notifications.class, restUrl);
-    }
-
-    @Override
     public Search search(String query) {
-        return search(Map.of("q", query));
+        return globals.search(QueryOptions.of(query));
     }
 
     @Override
-    public Search search(Map<String, Object> queryMap) {
-        return globals.search(queryMap);
+    public Search search(QueryOptions queryOptions) {
+        return globals.search(queryOptions);
     }
 }

@@ -27,47 +27,47 @@ package org.mastodon4j.core.api;
 
 import feign.Param;
 import feign.RequestLine;
-import org.mastodon4j.core.api.entities.Status;
+import org.mastodon4j.core.api.entities.Account;
+import org.mastodon4j.core.api.entities.MList;
 
 import java.util.List;
 
 /**
- * Contains all timeline related REST call methods.
+ * Contains all lists related REST call methods.
  *
- * @see <a href="https://docs.joinmastodon.org/methods/timelines/">mastodon/timelines</a>
+ * @see <a href="https://docs.joinmastodon.org/methods/lists/">mastodon/lists</a>
  */
-public interface Timelines {
+public interface Lists {
     /**
-     * <a href="https://docs.joinmastodon.org/methods/timelines/#public">View public timeline</a>.
+     * <a href="https://docs.joinmastodon.org/methods/lists/#get">View your lists</a>
+     * <p>
+     * Fetch all lists that the user owns.
      *
-     * @return a list containing statuses from the public timeline
+     * @return list of defined user lists
      */
-    @RequestLine("GET /api/v1/timelines/public")
-    List<Status> pub();
+    @RequestLine("GET /api/v1/lists")
+    List<MList> get();
 
     /**
-     * <a href="https://docs.joinmastodon.org/methods/timelines/#tag">View hashtag timeline</a>.
+     * <a href="https://docs.joinmastodon.org/methods/lists/#get-one">Show a single list</a>
+     * <p>
+     * Fetch the list with the given ID. Used for verifying the title of a list, and which replies to show within
+     * that list.
      *
-     * @param hashtag the tag id without the leading {@code #} symbol
-     * @return a list containing statuses from the hashtag timeline
+     * @param id the list id
+     * @return list of defined user lists
      */
-    @RequestLine("GET /api/v1/timelines/tag/{hashtag}}")
-    List<Status> tag(@Param("hashtag") String hashtag);
+    @RequestLine("GET /api/v1/lists/{id}")
+    MList get(@Param("id") String id);
 
     /**
-     * <a href="https://docs.joinmastodon.org/methods/timelines/#home">View home timeline</a>.
+     * <a href="https://docs.joinmastodon.org/methods/lists/#accounts">View accounts in a list</a>.
+     * <p>
+     * Accounts which within the given list id.
      *
-     * @return a list containing statuses from the local timeline
+     * @param id the account id
+     * @return a list of list members
      */
-    @RequestLine("GET /api/v1/timelines/home")
-    List<Status> home();
-
-    /**
-     * <a href="https://docs.joinmastodon.org/methods/timelines/#list">View list timeline</a>.
-     *
-     * @param listId the list id
-     * @return a list containing statuses from the list timeline
-     */
-    @RequestLine("GET /api/v1/timelines/list/{listId}")
-    List<Status> list(@Param("listId") String listId);
+    @RequestLine("GET /api/v1/lists/{id}/accounts")
+    List<Account> accounts(@Param("id") String id);
 }

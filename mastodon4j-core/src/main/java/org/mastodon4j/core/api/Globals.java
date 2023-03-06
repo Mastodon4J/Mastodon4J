@@ -27,21 +27,96 @@ package org.mastodon4j.core.api;
 
 import feign.QueryMap;
 import feign.RequestLine;
+import org.mastodon4j.core.api.entities.MList;
 import org.mastodon4j.core.api.entities.Search;
 
+import java.util.List;
 import java.util.Map;
 
 /**
  * Contains all global related REST call methods.
  */
 public interface Globals {
-
     /**
-     * Search for content in accounts, statuses and hashtags.
+     * <a href="https://docs.joinmastodon.org/methods/search/#v2">Perform a search</a>
      *
-     * @param queryMap map containing all query parameter name/value combinations
+     * @param queryOptions query options record containing all query parameters
      * @return a search result instance
      */
     @RequestLine("GET /api/v2/search")
-    Search search(@QueryMap Map<String, Object> queryMap);
+    Search search(@QueryMap QueryOptions queryOptions);
+
+    record QueryOptions(String q,
+                        String type,
+                        Boolean resolve,
+                        Boolean following,
+                        String account_id,
+                        Boolean exclude_unreviewed,
+                        String max_id,
+                        String min_id,
+                        Integer limit,
+                        Integer offset) {
+
+        public static QueryOptions of(String query) {
+            return new QueryOptions(query, null, null, null, null, null,
+                    null, null, null, null);
+        }
+
+        public QueryOptions type(QueryOptions.Type type) {
+            return new QueryOptions(q, type.value(), resolve, following, account_id, exclude_unreviewed, max_id, min_id,
+                    limit, offset);
+        }
+
+        public QueryOptions resolve(boolean resolve) {
+            return new QueryOptions(q, type, resolve, following, account_id, exclude_unreviewed, max_id, min_id,
+                    limit, offset);
+        }
+
+        public QueryOptions following(boolean following) {
+            return new QueryOptions(q, type, resolve, following, account_id, exclude_unreviewed, max_id, min_id,
+                    limit, offset);
+        }
+
+        public QueryOptions accountId(String account_id) {
+            return new QueryOptions(q, type, resolve, following, account_id, exclude_unreviewed, max_id, min_id,
+                    limit, offset);
+        }
+
+        public QueryOptions excludeUnreviewed(boolean exclude_unreviewed) {
+            return new QueryOptions(q, type, resolve, following, account_id, exclude_unreviewed, max_id, min_id,
+                    limit, offset);
+        }
+
+        public QueryOptions maxId(String max_id) {
+            return new QueryOptions(q, type, resolve, following, account_id, exclude_unreviewed, max_id, min_id,
+                    limit, offset);
+        }
+
+        public QueryOptions minId(String min_id) {
+            return new QueryOptions(q, type, resolve, following, account_id, exclude_unreviewed, max_id, min_id,
+                    limit, offset);
+        }
+
+        public QueryOptions limit(int limit) {
+            return new QueryOptions(q, type, resolve, following, account_id, exclude_unreviewed, max_id, min_id,
+                    limit, offset);
+        }
+
+        public QueryOptions offset(int offset) {
+            return new QueryOptions(q, type, resolve, following, account_id, exclude_unreviewed, max_id, min_id,
+                    limit, offset);
+        }
+
+        public enum Type {
+            ACCOUNTS, HASHTAGS, STATUSES;
+
+            public static QueryOptions.Type ofValue(String value) {
+                return QueryOptions.Type.valueOf(value.toUpperCase());
+            }
+
+            public String value() {
+                return name().toLowerCase();
+            }
+        }
+    }
 }
