@@ -30,11 +30,14 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import feign.Feign;
+import feign.Response;
+import feign.codec.ErrorDecoder;
 import feign.http2client.Http2Client;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import org.mastodon4j.core.api.*;
 import org.mastodon4j.core.api.entities.AccessToken;
+import org.mastodon4j.core.api.entities.Instance;
 import org.mastodon4j.core.api.entities.Search;
 
 import java.util.Map;
@@ -45,6 +48,13 @@ public class MastodonClient implements MastodonApi {
     private final Feign.Builder builder;
     private final String restUrl;
     private final Globals globals;
+
+    private Apps apps;
+    private Lists lists;
+    private Notifications notifications;
+    private Statuses statuses;
+    private Streaming streaming;
+    private Timelines timelines;
 
     MastodonClient(final Feign.Builder builder, String restUrl) {
         this.builder = builder;
@@ -86,27 +96,55 @@ public class MastodonClient implements MastodonApi {
 
     @Override
     public Apps apps() {
-        return builder.target(Apps.class, restUrl);
+        if (apps == null) {
+            apps = builder.target(Apps.class, restUrl);
+        }
+        return apps;
     }
 
     @Override
     public Lists lists() {
-        return builder.target(Lists.class, restUrl);
+        if (lists == null) {
+            lists = builder.target(Lists.class, restUrl);
+        }
+        return lists;
     }
 
     @Override
     public Notifications notifications() {
-        return builder.target(Notifications.class, restUrl);
+        if (notifications == null) {
+            notifications = builder.target(Notifications.class, restUrl);
+        }
+        return notifications;
     }
 
     @Override
     public Statuses statuses() {
-        return builder.target(Statuses.class, restUrl);
+        if (statuses == null) {
+            statuses = builder.target(Statuses.class, restUrl);
+        }
+        return statuses;
+    }
+
+    @Override
+    public Streaming streaming() {
+        if (streaming == null) {
+            streaming = builder.target(Streaming.class, restUrl);
+        }
+        return streaming;
     }
 
     @Override
     public Timelines timelines() {
-        return builder.target(Timelines.class, restUrl);
+        if (timelines == null) {
+            timelines = builder.target(Timelines.class, restUrl);
+        }
+        return timelines;
+    }
+
+    @Override
+    public Instance instance() {
+        return globals.instance();
     }
 
     @Override

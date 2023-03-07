@@ -23,35 +23,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.mastodon4j.core.api;
+package org.mastodon4j.core.api.entities;
 
-import org.mastodon4j.core.api.entities.Search;
-
-/**
- * Represents the main Mastodom4J interface.
- */
-public interface MastodonApi extends Globals {
-    Apps apps();
-
-    Accounts accounts();
-
-    Lists lists();
-
-    Notifications notifications();
-
-    Statuses statuses();
-
-    Streaming streaming();
-
-    Timelines timelines();
-
-    // other global methods
-
-    /**
-     * Search for content in accounts, statuses and hashtags.
-     *
-     * @param query the search query to execute
-     * @return a search result instance
-     */
-    Search search(String query);
+public record Rule(String id,
+                   String text) {
 }

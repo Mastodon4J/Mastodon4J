@@ -27,6 +27,7 @@ package org.mastodon4j.core.api;
 
 import feign.QueryMap;
 import feign.RequestLine;
+import org.mastodon4j.core.api.entities.Instance;
 import org.mastodon4j.core.api.entities.MList;
 import org.mastodon4j.core.api.entities.Search;
 
@@ -37,6 +38,16 @@ import java.util.Map;
  * Contains all global related REST call methods.
  */
 public interface Globals {
+    /**
+     * <a href="https://docs.joinmastodon.org/methods/instance/#v2">View server information</a>
+     * <p>
+     * Obtain general information about the server.
+     *
+     * @return a instance information object
+     */
+    @RequestLine("GET /api/v2/instance")
+    Instance instance();
+
     /**
      * <a href="https://docs.joinmastodon.org/methods/search/#v2">Perform a search</a>
      *

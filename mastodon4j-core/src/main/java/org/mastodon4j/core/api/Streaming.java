@@ -25,33 +25,20 @@
  */
 package org.mastodon4j.core.api;
 
-import org.mastodon4j.core.api.entities.Search;
+import feign.RequestLine;
 
 /**
- * Represents the main Mastodom4J interface.
+ * Contains all streaming related call methods.
+ *
+ * @see <a href="https://docs.joinmastodon.org/methods/streaming/#streams">Streaming timelines/categories</a>
  */
-public interface MastodonApi extends Globals {
-    Apps apps();
-
-    Accounts accounts();
-
-    Lists lists();
-
-    Notifications notifications();
-
-    Statuses statuses();
-
-    Streaming streaming();
-
-    Timelines timelines();
-
-    // other global methods
-
+public interface Streaming {
     /**
-     * Search for content in accounts, statuses and hashtags.
-     *
-     * @param query the search query to execute
-     * @return a search result instance
+     * <a href="https://docs.joinmastodon.org/methods/streaming/#health">Check if the server is alive</a>.
+     * <p>
+     * Verify that the streaming service is alive before connecting to it
+     * @return {@code true} if the service is alive, {@code false} otherwise
      */
-    Search search(String query);
+    @RequestLine("GET /api/v1/streaming/health")
+    boolean health();
 }

@@ -57,6 +57,14 @@ class MastodonClientTest {
     }
 
     @Test
+    void instance() {
+        assertThat(client.instance()).isNotNull().satisfies(instance -> {
+            log(instance);
+            assertThat(instance).isNotNull();
+        });
+    }
+
+    @Test
     void search() {
         assertThat(client.search("@reinhapa")).isNotNull().satisfies(search -> {
             log(search);
