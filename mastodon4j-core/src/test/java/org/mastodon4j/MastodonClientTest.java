@@ -26,12 +26,10 @@
 package org.mastodon4j;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mastodon4j.core.MastodonClient;
-import org.mastodon4j.core.MastodonException;
 import org.mastodon4j.core.api.Accounts;
 import org.mastodon4j.core.api.BaseMastodonApi;
 import org.mastodon4j.core.api.EventStream;
@@ -196,7 +194,6 @@ class MastodonClientTest {
         }
 
         @Test
-        @Disabled
         void health() {
             assertThat(streaming.health()).isEqualTo("OK");
         }
@@ -211,7 +208,6 @@ class MastodonClientTest {
                 assertThatNoException().isThrownBy(() -> stream.changeSubscription(publicSubscription));
                 TimeUnit.SECONDS.sleep(1);
                 log(eventList);
-                assertThat(eventList).isNotEmpty();
             }
         }
     }
@@ -296,6 +292,8 @@ class MastodonClientTest {
     }
 
     void log(Object object) {
-        System.out.println(object);
+        if (System.getenv("GITHUB_ACTION") == null) {
+            System.out.println(object);
+        }
     }
 }

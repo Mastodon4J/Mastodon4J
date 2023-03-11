@@ -28,6 +28,7 @@ package org.mastodon4j.core;
 import feign.Feign;
 import feign.Response;
 import feign.RequestTemplate;
+import feign.Util;
 import feign.http2client.Http2Client;
 import org.mastodon4j.core.api.Accounts;
 import org.mastodon4j.core.api.Apps;
@@ -45,8 +46,10 @@ import org.mastodon4j.core.api.entities.Search;
 import org.mastodon4j.core.impl.JsonUtil;
 import org.mastodon4j.core.impl.MastodonStreaming;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.lang.reflect.Type;
 import java.net.http.HttpClient;
 import java.net.http.WebSocket;
@@ -107,7 +110,18 @@ public class MastodonClient implements MastodonApi {
     }
 
     private static Object decode(Response response, Type type) throws IOException {
+        if (response.status() == 404 || response.status() == 204) {
+            return Util.emptyValueOf(type);
+        } else if (response.body() == null) {
+            return null;
+        }
         try (Reader reader = response.body().asReader(response.charset())) {
+            // special handling for basic java types
+            if (String.class.equals(type)) {
+                StringWriter sw = new StringWriter();
+                reader.transferTo(sw);
+                return sw.toString();
+            }
             return JsonUtil.fromJson(reader, type);
         }
     }
