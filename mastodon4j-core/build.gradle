@@ -23,9 +23,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-plugins {
-    id 'java-library'
-}
 
 dependencies {
     api platform('com.fasterxml.jackson:jackson-bom:2.14.2')

@@ -23,6 +23,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath "org.kordamp.gradle:settings-gradle-plugin:$kordampPluginVersion"
+        classpath "org.kordamp.gradle:insight-gradle-plugin:$kordampPluginVersion"
+        classpath "org.kordamp.gradle:java-project-gradle-plugin:$kordampPluginVersion"
+        classpath "org.kordamp.gradle:checkstyle-gradle-plugin:$kordampPluginVersion"
+        classpath "org.kordamp.gradle:errorprone-gradle-plugin:$kordampPluginVersion"
+        classpath "org.kordamp.gradle:sonar-gradle-plugin:$kordampPluginVersion"
+        classpath "com.diffplug.spotless:spotless-plugin-gradle:$spotlessPluginVersion"
+        classpath "org.owasp:dependency-check-gradle:$dependencyPluginVersion"
+    }
+}
+
+apply plugin: 'org.kordamp.gradle.settings'
+apply plugin: 'org.kordamp.gradle.insight'
+
 rootProject.name = 'Mastodon4J'
-include('mastodon4j-core')
-include('mastodon4j-stream')
+
+projects {
+    layout = 'standard'
+
+    plugins {
+        all {
+            id 'idea'
+            id 'com.diffplug.spotless'
+            id 'org.owasp.dependencycheck'
+        }
+        path(':') {
+            id 'org.kordamp.gradle.java-project'
+            id 'org.kordamp.gradle.checkstyle'
+            id 'org.kordamp.gradle.errorprone'
+            id 'org.kordamp.gradle.sonar'
+        }
+        path(':mastodon4j-core') {
+            id 'java-library'
+        }
+    }
+}
