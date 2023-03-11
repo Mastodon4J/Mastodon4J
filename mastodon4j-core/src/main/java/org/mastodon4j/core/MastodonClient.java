@@ -25,30 +25,45 @@
  */
 package org.mastodon4j.core;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import feign.Feign;
 import feign.Response;
-import feign.codec.ErrorDecoder;
+import feign.RequestTemplate;
 import feign.http2client.Http2Client;
-import feign.jackson.JacksonDecoder;
-import feign.jackson.JacksonEncoder;
-import org.mastodon4j.core.api.*;
+import org.mastodon4j.core.api.Accounts;
+import org.mastodon4j.core.api.Apps;
+import org.mastodon4j.core.api.BaseMastodonApi;
+import org.mastodon4j.core.api.BaseStreaming;
+import org.mastodon4j.core.api.Lists;
+import org.mastodon4j.core.api.MastodonApi;
+import org.mastodon4j.core.api.Notifications;
+import org.mastodon4j.core.api.Statuses;
+import org.mastodon4j.core.api.Streaming;
+import org.mastodon4j.core.api.Timelines;
 import org.mastodon4j.core.api.entities.AccessToken;
 import org.mastodon4j.core.api.entities.Instance;
 import org.mastodon4j.core.api.entities.Search;
+import org.mastodon4j.core.impl.JsonUtil;
+import org.mastodon4j.core.impl.MastodonStreaming;
 
-import java.util.Map;
+import java.io.IOException;
+import java.io.Reader;
+import java.lang.reflect.Type;
+import java.net.http.HttpClient;
+import java.net.http.WebSocket;
+import java.time.Duration;
+import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
 
 public class MastodonClient implements MastodonApi {
+    public static final String USER_AGENT_NAME = "Mastodon4J";
+    private final HttpClient httpClient;
     private final Feign.Builder builder;
     private final String restUrl;
-    private final Globals globals;
+    private final Supplier<String> authorizationSupplier;
+    private final BaseMastodonApi globals;
 
+    private Accounts accounts;
     private Apps apps;
     private Lists lists;
     private Notifications notifications;
@@ -56,10 +71,12 @@ public class MastodonClient implements MastodonApi {
     private Streaming streaming;
     private Timelines timelines;
 
-    MastodonClient(final Feign.Builder builder, String restUrl) {
+    MastodonClient(final HttpClient httpClient, final Feign.Builder builder, final String restUrl, final Supplier<String> authorizationSupplier) {
+        this.httpClient = httpClient;
         this.builder = builder;
         this.restUrl = restUrl;
-        this.globals = builder.target(Globals.class, restUrl);
+        this.authorizationSupplier = authorizationSupplier;
+        this.globals = builder.target(BaseMastodonApi.class, restUrl);
     }
 
     /**
@@ -73,25 +90,38 @@ public class MastodonClient implements MastodonApi {
         requireNonNull(restUrl);
         requireNonNull(accessToken);
 
-        final ObjectMapper objectMapper = new ObjectMapper()
-                .findAndRegisterModules()
-                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .configure(SerializationFeature.INDENT_OUTPUT, true);
+        final HttpClient httpClient = HttpClient.newBuilder()
+                .followRedirects(HttpClient.Redirect.ALWAYS)
+                .version(HttpClient.Version.HTTP_2)
+                .connectTimeout(Duration.ofSeconds(10))
+                .build();
 
         final Feign.Builder builder = Feign.builder()
-                .client(new Http2Client())
-                .encoder(new JacksonEncoder(objectMapper))
-                .decoder(new JacksonDecoder(objectMapper))
-                .requestInterceptor(template -> template.header("User-Agent", "Mastodon4J"))
+                .client(new Http2Client(httpClient))
+                .encoder(MastodonClient::encode)
+                .decoder(MastodonClient::decode)
+                .requestInterceptor(template -> template.header("User-Agent", USER_AGENT_NAME))
                 .requestInterceptor(template -> template.header("Authorization", accessToken.authorization()));
 
-        return new MastodonClient(builder, restUrl);
+        return new MastodonClient(httpClient, builder, restUrl, accessToken::authorization);
+    }
+
+    private static Object decode(Response response, Type type) throws IOException {
+        try (Reader reader = response.body().asReader(response.charset())) {
+            return JsonUtil.fromJson(reader, type);
+        }
+    }
+
+    private static void encode(Object object, Type bodyType, RequestTemplate template) {
+        template.body(JsonUtil.toJson(object));
     }
 
     @Override
     public Accounts accounts() {
-        return builder.target(Accounts.class, restUrl);
+        if (accounts == null) {
+            accounts = builder.target(Accounts.class, restUrl);
+        }
+        return accounts;
     }
 
     @Override
@@ -129,7 +159,14 @@ public class MastodonClient implements MastodonApi {
     @Override
     public Streaming streaming() {
         if (streaming == null) {
-            streaming = builder.target(Streaming.class, restUrl);
+            final WebSocket.Builder webSocketBuilder = httpClient
+                    .newWebSocketBuilder()
+                    .header("User-Agent", USER_AGENT_NAME)
+                    .header("Authorization", authorizationSupplier.get());
+            final String baseStreamingUri = instance().configuration().urls().streaming();
+            final String streamingRestUrl = baseStreamingUri.replaceFirst("ws", "http");
+            final BaseStreaming baseStreaming = builder.target(BaseStreaming.class, streamingRestUrl);
+            streaming = new MastodonStreaming(baseStreaming, webSocketBuilder, baseStreamingUri);
         }
         return streaming;
     }

@@ -30,7 +30,7 @@ import org.mastodon4j.core.api.entities.Search;
 /**
  * Represents the main Mastodom4J interface.
  */
-public interface MastodonApi extends Globals {
+public interface MastodonApi extends BaseMastodonApi {
     Apps apps();
 
     Accounts accounts();

@@ -26,32 +26,43 @@
 package org.mastodon4j;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mastodon4j.core.MastodonClient;
+import org.mastodon4j.core.MastodonException;
 import org.mastodon4j.core.api.Accounts;
-import org.mastodon4j.core.api.Globals;
+import org.mastodon4j.core.api.BaseMastodonApi;
+import org.mastodon4j.core.api.EventStream;
 import org.mastodon4j.core.api.Lists;
 import org.mastodon4j.core.api.MastodonApi;
 import org.mastodon4j.core.api.Statuses;
+import org.mastodon4j.core.api.Streaming;
 import org.mastodon4j.core.api.Timelines;
 import org.mastodon4j.core.api.entities.AccessToken;
 import org.mastodon4j.core.api.entities.Account;
+import org.mastodon4j.core.api.entities.Event;
 import org.mastodon4j.core.api.entities.MList;
 import org.mastodon4j.core.api.entities.Status;
+import org.mastodon4j.core.api.entities.Subscription;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mastodon4j.core.api.Globals.QueryOptions.Type.ACCOUNTS;
-import static org.mastodon4j.core.api.Globals.QueryOptions.Type.HASHTAGS;
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.mastodon4j.core.api.BaseMastodonApi.QueryOptions.Type.ACCOUNTS;
+import static org.mastodon4j.core.api.BaseMastodonApi.QueryOptions.Type.HASHTAGS;
 
 class MastodonClientTest {
+    static AccessToken accessToken;
     static MastodonApi client;
 
     @BeforeAll
     static void prepare() {
-        AccessToken accessToken = AccessToken.create(System.getenv("MASTODON_ACCESS_TOKEN"));
+        accessToken = AccessToken.create(System.getenv("MASTODON_ACCESS_TOKEN"));
         assertThat(accessToken.access_token()).isNotNull();
         client = MastodonClient.create("https://mastodon.social", accessToken);
     }
@@ -74,17 +85,17 @@ class MastodonClientTest {
 
     @Test
     void searchWithQueryOptions() {
-        assertThat(client.search(Globals.QueryOptions.of("@reinhapa").limit(1))).isNotNull().satisfies(search -> {
+        assertThat(client.search(BaseMastodonApi.QueryOptions.of("@reinhapa").limit(1))).isNotNull().satisfies(search -> {
             log(search);
             assertThat(search.accounts()).hasSize(1);
         });
-        assertThat(client.search(Globals.QueryOptions.of("@reinhapa").type(ACCOUNTS))).isNotNull().satisfies(search -> {
+        assertThat(client.search(BaseMastodonApi.QueryOptions.of("@reinhapa").type(ACCOUNTS))).isNotNull().satisfies(search -> {
             log(search);
             assertThat(search.accounts()).hasSize(2);
             assertThat(search.hashtags()).isEmpty();
             assertThat(search.statuses()).isEmpty();
         });
-        assertThat(client.search(Globals.QueryOptions.of("#vdz23").type(HASHTAGS))).isNotNull().satisfies(search -> {
+        assertThat(client.search(BaseMastodonApi.QueryOptions.of("#vdz23").type(HASHTAGS))).isNotNull().satisfies(search -> {
             log(search);
             assertThat(search.accounts()).isEmpty();
             assertThat(search.hashtags()).hasSize(1);
@@ -96,6 +107,11 @@ class MastodonClientTest {
     @DisplayName("accounts")
     class AccountsTest {
         Accounts accounts = client.accounts();
+
+        @Test
+        void instanceCache() {
+            assertThat(client.accounts()).isSameAs(accounts);
+        }
 
         @Test
         void get() {
@@ -153,6 +169,11 @@ class MastodonClientTest {
         Statuses statuses = client.statuses();
 
         @Test
+        void instanceCache() {
+            assertThat(client.statuses()).isSameAs(statuses);
+        }
+
+        @Test
         void get() {
             assertThat(statuses.get("109967065377609606")).isNotNull().satisfies(status -> {
                 log(status);
@@ -165,9 +186,45 @@ class MastodonClientTest {
     }
 
     @Nested
+    @DisplayName("streaming")
+    class StreamingTest {
+        Streaming streaming = client.streaming();
+
+        @Test
+        void instanceCache() {
+            assertThat(client.streaming()).isSameAs(streaming);
+        }
+
+        @Test
+        @Disabled
+        void health() {
+            assertThat(streaming.health()).isEqualTo("OK");
+        }
+
+        @Test
+        void stream() throws Exception {
+            try (EventStream stream = streaming.stream()) {
+                assertThat(stream).isNotNull();
+                List<Event> eventList = new ArrayList<>();
+                stream.registerConsumer(eventList::add);
+                final Subscription publicSubscription = Subscription.subscribeStream(accessToken, "public");
+                assertThatNoException().isThrownBy(() -> stream.changeSubscription(publicSubscription));
+                TimeUnit.SECONDS.sleep(1);
+                log(eventList);
+                assertThat(eventList).isNotEmpty();
+            }
+        }
+    }
+
+    @Nested
     @DisplayName("lists")
     class ListsTest {
         Lists lists = client.lists();
+
+        @Test
+        void instanceCache() {
+            assertThat(client.lists()).isSameAs(lists);
+        }
 
         @Test
         void get() {
@@ -199,6 +256,11 @@ class MastodonClientTest {
     @DisplayName("timelines")
     class TimelinesTest {
         Timelines timelines = client.timelines();
+
+        @Test
+        void instanceCache() {
+            assertThat(client.timelines()).isSameAs(timelines);
+        }
 
         @Test
         void pub() {

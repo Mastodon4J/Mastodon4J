@@ -29,8 +29,9 @@ module org.mastodon4j.core {
     exports org.mastodon4j.core.api;
     exports org.mastodon4j.core.api.entities;
 
+    requires java.net.http;
+    requires jakarta.json.bind;
     requires feign.core;
     requires feign.java11;
-    requires feign.jackson;
-    requires com.fasterxml.jackson.databind;
+    requires feign.json;
 }

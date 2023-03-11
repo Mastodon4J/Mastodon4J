@@ -23,23 +23,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.mastodon4j.core.api;
+package org.mastodon4j.core;
 
 /**
- * Contains all streaming related call methods not relay on request response.
- *
- * @see <a href="https://docs.joinmastodon.org/methods/streaming/#streams">Streaming timelines/categories</a>
+ * An exception class that will be thrown when MastodonAPI calls are failed.
  */
-public interface Streaming extends BaseStreaming  {
-    /**
-     * <a href="https://docs.joinmastodon.org/methods/streaming/#websocket">Establishing a WebSocket connection</a>.
-     * <p>
-     * Open a multiplexed WebSocket connection to receive events.
-     * <p>
-     * The status stream object returned by this method needs to be closed by the consumer when no longer needed in
-     * order for the underlying websocket to be closed.
-     *
-     * @return a new closable status stream object
-     */
-    EventStream stream();
+public class MastodonException extends Exception {
+    public MastodonException(Throwable cause) {
+        super(cause);
+    }
 }

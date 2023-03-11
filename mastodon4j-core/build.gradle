@@ -25,10 +25,9 @@
  */
 
 dependencies {
-    api platform('com.fasterxml.jackson:jackson-bom:2.14.2')
     api platform('io.github.openfeign:feign-bom:12.2')
-    api 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     api 'io.github.openfeign:feign-core'
-    api 'io.github.openfeign:feign-jackson'
+    api 'io.github.openfeign:feign-json'
     api 'io.github.openfeign:feign-java11'
+    api 'org.eclipse:yasson:3.0.2'
 }

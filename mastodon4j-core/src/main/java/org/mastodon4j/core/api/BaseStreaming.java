@@ -25,21 +25,21 @@
  */
 package org.mastodon4j.core.api;
 
+import feign.RequestLine;
+
 /**
- * Contains all streaming related call methods not relay on request response.
+ * Contains all streaming related call methods.
  *
  * @see <a href="https://docs.joinmastodon.org/methods/streaming/#streams">Streaming timelines/categories</a>
  */
-public interface Streaming extends BaseStreaming  {
+public interface BaseStreaming {
     /**
-     * <a href="https://docs.joinmastodon.org/methods/streaming/#websocket">Establishing a WebSocket connection</a>.
+     * <a href="https://docs.joinmastodon.org/methods/streaming/#health">Check if the server is alive</a>.
      * <p>
-     * Open a multiplexed WebSocket connection to receive events.
-     * <p>
-     * The status stream object returned by this method needs to be closed by the consumer when no longer needed in
-     * order for the underlying websocket to be closed.
+     * Verify that the streaming service is alive before connecting to it
      *
-     * @return a new closable status stream object
+     * @return {@code true} if the service is alive, {@code false} otherwise
      */
-    EventStream stream();
+    @RequestLine("GET /api/v1/streaming/health")
+    String health();
 }

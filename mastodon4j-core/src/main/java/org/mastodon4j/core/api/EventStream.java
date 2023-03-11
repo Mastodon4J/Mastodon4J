@@ -25,21 +25,32 @@
  */
 package org.mastodon4j.core.api;
 
-/**
- * Contains all streaming related call methods not relay on request response.
- *
- * @see <a href="https://docs.joinmastodon.org/methods/streaming/#streams">Streaming timelines/categories</a>
- */
-public interface Streaming extends BaseStreaming  {
+import org.mastodon4j.core.MastodonException;
+import org.mastodon4j.core.api.entities.Event;
+import org.mastodon4j.core.api.entities.Subscription;
+
+import java.util.function.Consumer;
+
+public interface EventStream extends AutoCloseable {
     /**
-     * <a href="https://docs.joinmastodon.org/methods/streaming/#websocket">Establishing a WebSocket connection</a>.
-     * <p>
-     * Open a multiplexed WebSocket connection to receive events.
-     * <p>
-     * The status stream object returned by this method needs to be closed by the consumer when no longer needed in
-     * order for the underlying websocket to be closed.
+     * Adds a new event consumer to this stream.
      *
-     * @return a new closable status stream object
+     * @param statusConsumer the event consumer to add
      */
-    EventStream stream();
+    void registerConsumer(Consumer<Event> statusConsumer);
+
+    /**
+     * Sends the given subscription to that stream.
+     *
+     * @param subscription the subscription definition
+     */
+    void changeSubscription(Subscription subscription);
+
+    /**
+     * Closes the event stream and its underlying resources.
+     *
+     * @throws MastodonException if a error during the close operation occurs
+     */
+    @Override
+    void close() throws MastodonException;
 }

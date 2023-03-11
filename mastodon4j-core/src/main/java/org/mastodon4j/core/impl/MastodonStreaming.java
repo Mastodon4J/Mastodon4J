@@ -23,23 +23,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.mastodon4j.core.api;
+package org.mastodon4j.core.impl;
 
-/**
- * Contains all streaming related call methods not relay on request response.
- *
- * @see <a href="https://docs.joinmastodon.org/methods/streaming/#streams">Streaming timelines/categories</a>
- */
-public interface Streaming extends BaseStreaming  {
-    /**
-     * <a href="https://docs.joinmastodon.org/methods/streaming/#websocket">Establishing a WebSocket connection</a>.
-     * <p>
-     * Open a multiplexed WebSocket connection to receive events.
-     * <p>
-     * The status stream object returned by this method needs to be closed by the consumer when no longer needed in
-     * order for the underlying websocket to be closed.
-     *
-     * @return a new closable status stream object
-     */
-    EventStream stream();
+import org.mastodon4j.core.api.BaseStreaming;
+import org.mastodon4j.core.api.EventStream;
+import org.mastodon4j.core.api.Streaming;
+
+import java.net.URI;
+import java.net.http.WebSocket;
+
+public class MastodonStreaming implements Streaming {
+    private final BaseStreaming baseStreaming;
+    private final WebSocket.Builder websocketBuilder;
+    private final URI socketUri;
+
+    public MastodonStreaming(BaseStreaming baseStreaming, WebSocket.Builder websocketBuilder, String baseStreamingUri) {
+        this.baseStreaming = baseStreaming;
+        this.websocketBuilder = websocketBuilder;
+        this.socketUri = URI.create(baseStreamingUri + "/api/v1/streaming");
+    }
+
+    @Override
+    public String health() {
+        return baseStreaming.health();
+    }
+
+    @Override
+    public EventStream stream() {
+        final MastodonEventStream mastodonEventStream = new MastodonEventStream();
+        websocketBuilder.buildAsync(socketUri, mastodonEventStream).join();
+        return mastodonEventStream;
+    }
 }
