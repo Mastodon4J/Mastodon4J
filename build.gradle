@@ -23,34 +23,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-plugins {
-  id 'java-library'
-  id 'com.diffplug.spotless' version '6.16.0'
-  id 'org.owasp.dependencycheck' version '8.1.2'
-  id 'org.kordamp.gradle.java-project' version '0.49.0'
-}
-
-apply {
-  plugin 'org.kordamp.gradle.checkstyle'
-  plugin 'org.kordamp.gradle.errorprone'
-  plugin 'org.kordamp.gradle.sonar'
-}
 
 if (!project.hasProperty('sonatypeUsername')) ext.sonatypeUsername = '**undefined**'
 if (!project.hasProperty('sonatypePassword')) ext.sonatypePassword = '**undefined**'
 if (!project.hasProperty('sonarToken')) ext.sonarToken = '**undefined**'
-
+boolean localRelease = (project.rootProject.findProperty('localRelease') ?: false).toBoolean()
 
 defaultTasks 'build'
-
-allprojects {
-  project.group = 'org.mastodon4j'
-  project.version = '1.0.0-SNAPSHOT'
-
-  repositories {
-    mavenCentral()
-  }
-}
 
 config {
   release = !project.version.endsWith('-SNAPSHOT')
@@ -94,6 +73,17 @@ config {
           password = sonatypePassword
         }
       }
+      repository {
+        name = 'localRelease'
+        url  = "${project.rootProject.buildDir}/repos/local/release"
+      }
+      repository {
+        name = 'localSnapshot'
+        url  = "${project.rootProject.buildDir}/repos/local/snapshot"
+      }
+    }
+    implementation {
+      enabled = false
     }
   }
   quality {
@@ -106,6 +96,12 @@ config {
       organization = 'Mastodon4J'
       projectKey = 'Mastodon4J_Mastodon4J'
     }
+  }
+  buildInfo {
+    useCommitTimestamp = true
+    skipBuildBy = true
+    skipBuildJdk = true
+    skipBuildOs = true
   }
   licensing {
     licenses {
@@ -124,23 +120,36 @@ config {
       }
     }
   }
-  artifacts {
-    minpom.enabled = false
-  }
   publishing {
     signing {
       enabled = release
       secretKey = project.hasProperty('signingKey') ? signingKey : null
       password = project.hasProperty('signingPassword') ? signingPassword : null
     }
-    releasesRepository  = 'sonatypeRelease'
-    snapshotsRepository = 'sonatypeSnapshot'
+    releasesRepository  = localRelease? 'localRelease': 'sonatypeRelease'
+    snapshotsRepository = localRelease? 'localSnapshot': 'sonatypeSnapshot'
+  }
+}
+
+allprojects {
+  normalization {
+    runtimeClasspath {
+      ignore('/META-INF/MANIFEST.MF')
+    }
+  }
+
+  config {
+    info {
+      bytecodeVersion = 17
+    }
+  }
+
+  repositories {
+    mavenCentral()
   }
 }
 
 subprojects {
-  apply plugin: 'java-library'
-
   dependencies {
     testImplementation 'org.assertj:assertj-core:3.24.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
@@ -158,20 +167,8 @@ subprojects {
     }
   }
 
-  compileJava {
-    doFirst {
-      options.compilerArgs = [
-              '-Xlint:all'
-      ]
-    }
-  }
-
-  jar {
-    manifest.attributes 'Automatic-Module-Name': "org.mastodon4j.${project.name}"
-  }
-
   java {
-    sourceCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = project.sourceCompatibility
   }
 
   spotless {

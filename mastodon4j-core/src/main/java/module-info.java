@@ -24,11 +24,13 @@
  * THE SOFTWARE.
  */
 
-dependencies {
-    api platform('com.fasterxml.jackson:jackson-bom:2.14.2')
-    api platform('io.github.openfeign:feign-bom:12.2')
-    api 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
-    api 'io.github.openfeign:feign-core'
-    api 'io.github.openfeign:feign-jackson'
-    api 'io.github.openfeign:feign-java11'
+module org.mastodon4j.core {
+    exports org.mastodon4j.core;
+    exports org.mastodon4j.core.api;
+    exports org.mastodon4j.core.api.entities;
+
+    requires feign.core;
+    requires feign.java11;
+    requires feign.jackson;
+    requires com.fasterxml.jackson.databind;
 }
