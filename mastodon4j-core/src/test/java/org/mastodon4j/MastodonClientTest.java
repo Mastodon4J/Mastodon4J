@@ -203,11 +203,15 @@ class MastodonClientTest {
             try (EventStream stream = streaming.stream()) {
                 assertThat(stream).isNotNull();
                 List<Event> eventList = new ArrayList<>();
-                stream.registerConsumer(eventList::add);
-                final Subscription publicSubscription = Subscription.subscribeStream(accessToken, "public");
-                assertThatNoException().isThrownBy(() -> stream.changeSubscription(publicSubscription));
-                TimeUnit.SECONDS.sleep(1);
-                log(eventList);
+//                stream.registerConsumer(eventList::add);
+                stream.registerConsumer(event -> {
+                    if ("notification".equals(event.event())) {
+                        log(event);
+                    }
+                });
+                Subscription subscription = Subscription.stream(true, accessToken, "public");
+                assertThatNoException().isThrownBy(() -> stream.changeSubscription(subscription));
+                TimeUnit.SECONDS.sleep(20);
             }
         }
     }

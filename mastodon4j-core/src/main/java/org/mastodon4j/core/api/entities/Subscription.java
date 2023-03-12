@@ -25,39 +25,34 @@
  */
 package org.mastodon4j.core.api.entities;
 
-public record Subscription(String access_token,
-                           String type,
-                           String stream,
-                           String list,
-                           String tag) {
+public record Subscription(String access_token, String type, String stream, String list, String tag) {
 
     /**
-     * Create a subscription using the following parameters.
+     * Create a stream subscription using the following parameters.
      *
+     * @param subscribe   {@code true} subscribe, {@code false} unsubscribe
      * @param accessToken the access token
-     * @param stream the stream name
+     * @param stream      the stream name
      */
-    public static Subscription subscribeStream(AccessToken accessToken, String stream) {
-        return new Subscription(accessToken.access_token(), "subscribe", stream, null, null);
+    public static Subscription stream(boolean subscribe, AccessToken accessToken, String stream) {
+        return new Subscription(accessToken.access_token(), type(subscribe), stream, null, null);
     }
 
     /**
-     * Create a subscription using the following parameters.
+     * Create a hashtag subscription using the following parameters.
      *
+     * @param subscribe   {@code true} subscribe, {@code false} unsubscribe
      * @param accessToken the access token
-     * @param tag the optional hash stream tag
+     * @param tag         the optional hash stream tag
      */
-    public static Subscription subscribeHashtag(AccessToken accessToken, String tag) {
-        return new Subscription(accessToken.access_token(), "subscribe", "hashtag", null, tag);
+    public static Subscription hashtag(boolean subscribe, AccessToken accessToken, String tag) {
+        return new Subscription(accessToken.access_token(), type(subscribe), "hashtag", null, tag);
     }
 
-    /**
-     * Create a subscription using the following parameters.
-     *
-     * @param accessToken the access token
-     * @param stream the stream name
-     */
-    public static Subscription unsubscribe(AccessToken accessToken, String stream) {
-        return new Subscription(accessToken.access_token(), "unsubscribe", stream, null, null);
+    private static String type(boolean subscribe) {
+        if (subscribe) {
+            return "subscribe";
+        }
+        return "unsubscribe";
     }
 }
