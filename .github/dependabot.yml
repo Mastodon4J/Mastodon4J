@@ -1,10 +1,10 @@
 version: 2
 updates:
-- package-ecosystem:
-  - gradle
-  - github-actions
+- package-ecosystem: "gihub-actions"
   directory: "/"
   schedule:
-    interval: daily
-    time: "04:00"
-  open-pull-requests-limit: 10
+    interval: "weekly"
+- package-ecosystem: "gradle"
+  directory: "/"
+  schedule:
+    interval: "weekly"

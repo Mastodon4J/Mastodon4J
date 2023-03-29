@@ -173,8 +173,8 @@ subprojects {
 
   spotless {
     java {
-//      eclipse().configFile("gradle/mastodon4j-style.xml")
-//      importOrderFile('gradle/mastodon4j.importorder')
+//      eclipse().configFile("${rootDir}/gradle/mastodon4j-style.xml")
+//      importOrderFile("${rootDir}/gradle/mastodon4j.importorder")
     }
   }
 
