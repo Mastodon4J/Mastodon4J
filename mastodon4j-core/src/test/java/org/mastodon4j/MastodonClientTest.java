@@ -202,7 +202,7 @@ class MastodonClientTest {
         void stream() throws Exception {
             try (EventStream stream = streaming.stream()) {
                 assertThat(stream).isNotNull();
-                List<Event> eventList = new ArrayList<>();
+//                List<Event> eventList = new ArrayList<>();
 //                stream.registerConsumer(eventList::add);
                 stream.registerConsumer(event -> {
                     if ("notification".equals(event.event())) {
