@@ -29,6 +29,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
+import org.junit.jupiter.api.condition.EnabledIfSystemProperties;
 import org.mastodon4j.core.MastodonClient;
 import org.mastodon4j.core.api.Accounts;
 import org.mastodon4j.core.api.BaseMastodonApi;
@@ -54,6 +56,8 @@ import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.mastodon4j.core.api.BaseMastodonApi.QueryOptions.Type.ACCOUNTS;
 import static org.mastodon4j.core.api.BaseMastodonApi.QueryOptions.Type.HASHTAGS;
 
+@EnabledIfEnvironmentVariable(named = "MASTODON_ACCESS_TOKEN", matches = ".*")
+@EnabledIfEnvironmentVariable(named = "MASTODON_INSTANCE_URL", matches = ".*")
 class MastodonClientTest {
     static AccessToken accessToken;
     static MastodonApi client;
@@ -61,8 +65,7 @@ class MastodonClientTest {
     @BeforeAll
     static void prepare() {
         accessToken = AccessToken.create(System.getenv("MASTODON_ACCESS_TOKEN"));
-        assertThat(accessToken.access_token()).isNotNull();
-        client = MastodonClient.create("https://mastodon.social", accessToken);
+        client = MastodonClient.create(System.getenv("MASTODON_INSTANCE_URL"), accessToken);
     }
 
     @Test
