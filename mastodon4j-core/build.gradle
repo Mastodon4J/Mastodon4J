@@ -28,5 +28,5 @@ dependencies {
     api 'io.github.openfeign:feign-core'
     api 'io.github.openfeign:feign-json'
     api 'io.github.openfeign:feign-java11'
-    api 'org.eclipse:yasson:3.0.2'
+    api 'org.eclipse:yasson:3.0.3'
 }
