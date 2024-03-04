@@ -24,7 +24,7 @@
  * THE SOFTWARE.
  */
 dependencies {
-    api platform('io.github.openfeign:feign-bom:12.2')
+    api platform('io.github.openfeign:feign-bom:13.2.1')
     api 'io.github.openfeign:feign-core'
     api 'io.github.openfeign:feign-json'
     api 'io.github.openfeign:feign-java11'
