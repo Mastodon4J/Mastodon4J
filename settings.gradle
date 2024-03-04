@@ -29,20 +29,18 @@ buildscript {
         mavenCentral()
         gradlePluginPortal()
     }
-    dependencies {
-        classpath "org.kordamp.gradle:settings-gradle-plugin:$kordampPluginVersion"
-        classpath "org.kordamp.gradle:insight-gradle-plugin:$kordampPluginVersion"
-        classpath "org.kordamp.gradle:java-project-gradle-plugin:$kordampPluginVersion"
-        classpath "org.kordamp.gradle:checkstyle-gradle-plugin:$kordampPluginVersion"
-        classpath "org.kordamp.gradle:errorprone-gradle-plugin:$kordampPluginVersion"
-        classpath "org.kordamp.gradle:sonar-gradle-plugin:$kordampPluginVersion"
-        classpath "com.diffplug.spotless:spotless-plugin-gradle:$spotlessPluginVersion"
-        classpath "org.owasp:dependency-check-gradle:$dependencyPluginVersion"
-    }
 }
 
-apply plugin: 'org.kordamp.gradle.settings'
-apply plugin: 'org.kordamp.gradle.insight'
+plugins {
+    id 'org.kordamp.gradle.settings' version '0.54.0'
+    id 'org.kordamp.gradle.insight' version '0.54.0'
+    id 'org.kordamp.gradle.java-project' version '0.54.0' apply false
+    id 'org.kordamp.gradle.checkstyle' version '0.54.0' apply false
+    id 'org.kordamp.gradle.errorprone' version '0.54.0' apply false
+    id 'org.kordamp.gradle.sonar' version '0.54.0' apply false
+    id 'com.diffplug.spotless' version '6.25.0' apply false
+    id 'org.owasp.dependencycheck' version '9.0.9' apply false
+}
 
 rootProject.name = 'Mastodon4J'
 
