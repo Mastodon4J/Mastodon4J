@@ -74,11 +74,11 @@ config {
       }
       repository {
         name = 'localRelease'
-        url  = "${project.rootProject.buildDir}/repos/local/release"
+        url  = "${project.layout.buildDirectory}/repos/local/release"
       }
       repository {
         name = 'localSnapshot'
-        url  = "${project.rootProject.buildDir}/repos/local/snapshot"
+        url  = "${project.layout.buildDirectory}/repos/local/snapshot"
       }
     }
     implementation {
