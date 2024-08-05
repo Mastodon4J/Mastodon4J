@@ -29,5 +29,5 @@ dependencies {
     api 'io.github.openfeign:feign-json'
     api 'io.github.openfeign:feign-java11'
     api 'org.eclipse:yasson:3.0.3'
-    api 'org.eclipse.parsson:parsson:1.1.6' // fixes CVE-2023-4043
+    api 'org.eclipse.parsson:parsson:1.1.7' // fixes CVE-2023-4043
 }
